@@ -70,20 +70,19 @@ static void * APR_THREAD_FUNC get_IP(apr_thread_t * thread, void *data) {
     int old, interval = 1;
     int tick = 0;
     int now = PI_HIGH;
-    int wallclock = 0;
 
     while (1) {
 	if (gpio_read(pi, GPIO_RESET_PIN))
-	    wallclock = 0;
+	    tick = 0;
         old = now;
         now = gpio_read(pi, GPIO_PIN);
 
         if ((old == PI_HIGH) && (now == PI_LOW)) {
-            tick++;
-            wallclock += interval;
-	    if (interval)
+	    if (interval > 4) {
+                tick++;
                 instant_power = (float)POWER_TICK*1000/(interval*INTERVAL_MS);
-            cum_daily_energy_use = (float)tick/ROTATIONS_PER_KWH;
+                cum_daily_energy_use = (float)tick/ROTATIONS_PER_KWH;
+            }
             interval = 0;
         } else
             interval ++;
