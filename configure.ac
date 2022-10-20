@@ -102,6 +102,6 @@ AC_SUBST(ganglia_sysconfdir)
 
 #AC_OUTPUT(Makefile ganglia-gmond-modules.spec etc/Makefile etc/conf.d/module1.conf io/Makefile)
 
-AC_OUTPUT(Makefile example/Makefile fs/Makefile multicpu/Makefile io/Makefile user/Makefile)
+AC_OUTPUT(Makefile example/Makefile fs/Makefile ferraris/Makefile multicpu/Makefile io/Makefile user/Makefile)
 
 
