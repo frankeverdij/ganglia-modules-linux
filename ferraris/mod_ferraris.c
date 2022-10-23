@@ -55,17 +55,14 @@
 extern mmodule ferraris_module;
 
 static int pi;
-static float instant_power = 0.0;
-static float cum_daily_energy_use = 0.0;
+static float instant_power;
+static float cum_daily_energy_use;
 
 static apr_pool_t *pool;
 static apr_thread_t *gpio_thread;
 static apr_status_t status;
 
 static void * APR_THREAD_FUNC get_IP(apr_thread_t * thread, void *data) {        
-
-    set_mode(pi, GPIO_PIN, PI_INPUT);
-    set_mode(pi, GPIO_RESET_PIN, PI_INPUT);
 
     int old, interval = 1;
     int tick = 0;
@@ -78,7 +75,7 @@ static void * APR_THREAD_FUNC get_IP(apr_thread_t * thread, void *data) {
         now = gpio_read(pi, GPIO_PIN);
 
         if ((old == PI_HIGH) && (now == PI_LOW)) {
-	    if (interval > 4) {
+	    if (interval > 15) {
                 tick++;
                 instant_power = (float)POWER_TICK*1000/(interval*INTERVAL_MS);
                 cum_daily_energy_use = (float)tick/ROTATIONS_PER_KWH;
@@ -96,6 +93,11 @@ static void * APR_THREAD_FUNC get_IP(apr_thread_t * thread, void *data) {
 static int ferr_metric_init ( apr_pool_t *p )
 {
     pi = pigpio_start(NULL, NULL);
+    set_mode(pi, GPIO_PIN, PI_INPUT);
+    set_mode(pi, GPIO_RESET_PIN, PI_INPUT);
+
+    instant_power = 0.0;
+    cum_daily_energy_use = 0.0;
 
     pool = p;
     apr_thread_create(&gpio_thread, NULL, get_IP, NULL, pool);
